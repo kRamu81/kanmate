@@ -3,67 +3,118 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kanmate — Smart PDF Downloader | Download Any PDF Free</title>
-  <meta name="description" content="Kanmate is a smart PDF downloader that fetches documents from Scribd, Studocu, Google Drive, Archive.org, Academia.edu, and more without requiring a login."/>
-  <meta name="keywords" content="PDF downloader, Scribd downloader, Studocu downloader, Academia.edu downloader, bypass restrictions, free PDF download"/>
+  <title>Kanmate v1.1 — Smart PDF & Article Downloader</title>
+  <meta name="description" content="Kanmate is a smart PDF & article downloader. Download any PDF or article from Medium, LinkedIn, Scribd, Google Drive, Archive.org, and more. No login needed."/>
+  <meta name="keywords" content="PDF downloader, article downloader, Medium downloader, Scribd downloader, Google Drive PDF, free PDF download"/>
   <meta name="robots" content="index, follow"/>
-  <meta property="og:title" content="Kanmate — Smart PDF Downloader"/>
-  <meta property="og:description" content="Download any PDF from Scribd, Studocu, Google Drive, and more. No login required."/>
+  <meta property="og:title" content="Kanmate — Smart PDF & Article Downloader"/>
+  <meta property="og:description" content="Download any PDF or article from Medium, LinkedIn, Scribd, Google Drive, and more. Free, no login required."/>
   <meta property="og:type" content="website"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:title" content="Kanmate — Smart PDF Downloader"/>
-  <meta name="twitter:description" content="Download any PDF from Scribd, Studocu, Google Drive, and more. No login required."/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue: #5B5BD6;
-      --blue-light: #7B7FE8;
-      --blue-dark: #4747b8;
-      --navy: #1a1d2e;
-      --navy-soft: #252840;
-      --bg: #f5f6ff;
-      --bg2: #eef0fc;
-      --surface: #ffffff;
-      --border: #e2e4f3;
-      --border2: #d0d3ee;
-      --text: #1a1d2e;
-      --text2: #4a4e6b;
-      --muted: #8b8fad;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --success-border: #bbf7d0;
-      --warn: #d97706;
-      --warn-bg: #fffbeb;
-      --warn-border: #fde68a;
-      --error: #dc2626;
-      --error-bg: #fef2f2;
-      --error-border: #fecaca;
-      --info-bg: #eff6ff;
-      --info-border: #bfdbfe;
-      --info: #2563eb;
+      --purple: #8b5cf6;
+      --purple-light: #a78bfa;
+      --purple-dark: #6d28d9;
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --cyan: #06b6d4;
+      --pink: #ec4899;
+      --bg: #080812;
+      --bg2: #0d0d1f;
+      --bg3: #12122a;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --text: #f1f1f6;
+      --text2: #9ca3c4;
+      --muted: #5b5d7a;
+      --success: #10b981;
+      --success-bg: rgba(16,185,129,0.1);
+      --success-border: rgba(16,185,129,0.25);
+      --warn: #f59e0b;
+      --warn-bg: rgba(245,158,11,0.1);
+      --warn-border: rgba(245,158,11,0.25);
+      --error: #ef4444;
+      --error-bg: rgba(239,68,68,0.1);
+      --error-border: rgba(239,68,68,0.25);
+      --info: #3b82f6;
+      --info-bg: rgba(59,130,246,0.1);
+      --info-border: rgba(59,130,246,0.25);
+      --glow: 0 0 60px rgba(139,92,246,0.15);
     }
 
-    html, body {
-      min-height: 100%;
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* Subtle background pattern */
-    body::before {
-      content: '';
+    /* ── Animated Background ───────────────── */
+    .bg-orbs {
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(circle at 20% 10%, rgba(91,91,214,0.08) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 90%, rgba(91,91,214,0.05) 0%, transparent 50%);
-      pointer-events: none;
       z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
     }
 
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: orbFloat 12s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+      top: 30%; right: -80px;
+      animation-delay: -4s;
+    }
+
+    .orb-3 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%);
+      bottom: 10%; left: 20%;
+      animation-delay: -8s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(30px, -30px) scale(1.05); }
+      66%       { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* ── Layout ────────────────────────────── */
     .page {
       position: relative;
       z-index: 1;
@@ -71,108 +122,140 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 20px 80px;
+      padding: 0 20px 100px;
     }
 
-    /* ── NAV ─────────────────────────────── */
+    /* ── NAV ───────────────────────────────── */
     nav {
       width: 100%;
-      max-width: 920px;
+      max-width: 960px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 24px 0;
+      padding: 24px 0 20px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 64px;
+      margin-bottom: 72px;
     }
 
     .logo-wrap {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       text-decoration: none;
     }
 
-    .logo-img {
-      height: 36px;
-      width: auto;
+    .logo-icon-wrap {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 20px rgba(139,92,246,0.4);
+      flex-shrink: 0;
+    }
+
+    .logo-text-wrap {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-tagline {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--purple-light);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 3px;
     }
 
     .nav-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .nav-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 5px 12px;
       border-radius: 20px;
-      background: var(--blue);
-      color: #fff;
+      background: rgba(139,92,246,0.15);
+      border: 1px solid rgba(139,92,246,0.3);
+      color: var(--purple-light);
       letter-spacing: 0.3px;
     }
 
-    /* ── HERO ────────────────────────────── */
+    /* ── HERO ──────────────────────────────── */
     .hero {
       width: 100%;
-      max-width: 680px;
+      max-width: 700px;
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 52px;
     }
 
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--blue);
-      letter-spacing: 0.5px;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--purple-light);
+      letter-spacing: 1px;
       text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: 20px;
-      background: rgba(91,91,214,0.1);
-      border: 1px solid rgba(91,91,214,0.2);
-      margin-bottom: 24px;
+      padding: 7px 16px;
+      border-radius: 99px;
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.25);
+      margin-bottom: 28px;
     }
 
-    .hero-eyebrow::before {
-      content: '';
+    .hero-eyebrow-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--blue);
-      animation: blink 1.8s ease-in-out infinite;
+      background: var(--purple-light);
+      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 8px var(--purple-light);
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.25; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
     }
 
     h1 {
-      font-size: clamp(32px, 5.5vw, 54px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      color: var(--navy);
-      margin-bottom: 18px;
+      font-size: clamp(36px, 6vw, 62px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      color: #fff;
+      margin-bottom: 20px;
     }
 
-    h1 .blue { color: var(--blue); }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--purple-light) 0%, var(--blue-light) 50%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
     .hero-sub {
       font-size: 17px;
-      line-height: 1.7;
+      line-height: 1.75;
       color: var(--text2);
-      max-width: 520px;
-      margin: 0 auto 28px;
+      max-width: 560px;
+      margin: 0 auto 32px;
       font-weight: 400;
     }
 
-    /* Platform chips */
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -182,44 +265,112 @@
 
     .chip {
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 6px 14px;
-      border-radius: 20px;
+      border-radius: 99px;
       background: var(--surface);
       border: 1px solid var(--border2);
       color: var(--text2);
-      transition: all 0.2s;
+      transition: all 0.25s;
       cursor: default;
+      letter-spacing: 0.1px;
     }
 
     .chip:hover {
-      border-color: var(--blue);
-      color: var(--blue);
-      background: rgba(91,91,214,0.05);
+      border-color: var(--purple);
+      color: var(--purple-light);
+      background: rgba(139,92,246,0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139,92,246,0.2);
     }
 
-    /* ── MAIN CARD ───────────────────────── */
-    .card {
+    .chip.new-feature {
+      border-color: rgba(16,185,129,0.4);
+      color: #34d399;
+      background: rgba(16,185,129,0.08);
+    }
+
+    .chip.new-feature:hover {
+      border-color: #10b981;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.2);
+    }
+
+    /* ── TAB SWITCHER ──────────────────────── */
+    .tab-wrap {
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
+      margin-bottom: 20px;
+    }
+
+    .tabs {
+      display: inline-flex;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 14px;
+      padding: 5px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+    }
+
+    .tab-btn:not(.active):hover { color: var(--text); background: var(--surface2); }
+
+    /* ── MAIN CARD ─────────────────────────── */
+    .card {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(13,13,31,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
       padding: 36px;
-      box-shadow: 0 4px 6px rgba(91,91,214,0.04), 0 20px 60px rgba(91,91,214,0.08), 0 0 0 1px rgba(255,255,255,0.8) inset;
+      box-shadow: var(--glow), 0 0 0 1px rgba(255,255,255,0.03) inset;
       margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(139,92,246,0.5), rgba(59,130,246,0.5), transparent);
     }
 
     .input-label {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       color: var(--text2);
-      margin-bottom: 10px;
-      letter-spacing: -0.1px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
+
+    .input-label svg { color: var(--purple-light); }
 
     .input-row {
       display: flex;
@@ -229,341 +380,539 @@
 
     .url-input {
       flex: 1;
-      background: var(--bg);
+      background: rgba(255,255,255,0.04);
       border: 1.5px solid var(--border2);
-      border-radius: 12px;
-      padding: 14px 18px;
+      border-radius: 14px;
+      padding: 15px 20px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
-      color: var(--navy);
+      color: var(--text);
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      transition: all 0.25s;
       min-width: 0;
     }
 
     .url-input::placeholder { color: var(--muted); }
 
     .url-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(91,91,214,0.12);
-      background: #fff;
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.15), 0 0 20px rgba(139,92,246,0.1);
+      background: rgba(139,92,246,0.04);
     }
 
-    .btn-dl {
+    .btn-primary {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 14px 26px;
-      background: var(--blue);
+      padding: 15px 28px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
       white-space: nowrap;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 14px rgba(91,91,214,0.35);
-      letter-spacing: -0.2px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+      letter-spacing: -0.1px;
+      flex-shrink: 0;
     }
 
-    .btn-dl:hover {
-      background: var(--blue-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(91,91,214,0.4);
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(139,92,246,0.5);
+      filter: brightness(1.1);
     }
 
-    .btn-dl:active { transform: translateY(0); }
-    .btn-dl:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; }
 
-    /* Platform detect badge */
+    /* Platform pill */
     .platform-pill {
       display: none;
       align-items: center;
-      gap: 7px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 14px;
       font-size: 12px;
-      font-weight: 500;
-      color: var(--blue);
+      font-weight: 600;
+      color: var(--purple-light);
+      background: rgba(139,92,246,0.08);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 99px;
+      padding: 6px 14px;
+      width: fit-content;
+      transition: all 0.25s;
     }
 
     .platform-pill.show { display: flex; }
-    .platform-pill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+    .platform-pill-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      box-shadow: 0 0 6px var(--purple-light);
+    }
+
+    /* Article pill override */
+    .platform-pill.article-mode {
+      color: #34d399;
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.25);
+    }
+    .platform-pill.article-mode .platform-pill-dot {
+      background: #34d399;
+      box-shadow: 0 0 6px #34d399;
+    }
 
     /* Progress */
-    .progress-wrap { display: none; margin-top: 18px; }
+    .progress-wrap { display: none; margin-top: 20px; }
     .progress-wrap.show { display: block; }
 
     .progress-meta {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--muted);
       margin-bottom: 8px;
+      letter-spacing: 0.3px;
     }
 
     .progress-track {
-      height: 5px;
-      background: var(--bg2);
+      height: 4px;
+      background: rgba(255,255,255,0.06);
       border-radius: 99px;
       overflow: hidden;
     }
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--blue), var(--blue-light));
+      background: linear-gradient(90deg, var(--purple), var(--blue), var(--cyan));
       border-radius: 99px;
       width: 0%;
       transition: width 0.4s ease;
+      box-shadow: 0 0 10px rgba(139,92,246,0.5);
     }
 
-    /* Status messages */
+    /* Status */
     .status-area { margin-top: 18px; }
 
     .status-box {
-      border-radius: 12px;
-      padding: 14px 16px;
+      border-radius: 14px;
+      padding: 16px 18px;
       font-size: 13.5px;
       line-height: 1.6;
       display: flex;
       align-items: flex-start;
-      gap: 10px;
-      animation: fadeUp 0.25s ease;
+      gap: 12px;
+      animation: fadeUp 0.3s ease;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(5px); }
+      from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .status-box.success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success); }
-    .status-box.error   { background: var(--error-bg);   border: 1px solid var(--error-border);   color: var(--error); }
-    .status-box.warn    { background: var(--warn-bg);    border: 1px solid var(--warn-border);    color: var(--warn); }
-    .status-box.info    { background: var(--info-bg);    border: 1px solid var(--info-border);    color: var(--info); }
+    .status-box.success { background: var(--success-bg); border: 1px solid var(--success-border); }
+    .status-box.error   { background: var(--error-bg);   border: 1px solid var(--error-border); }
+    .status-box.warn    { background: var(--warn-bg);    border: 1px solid var(--warn-border); }
+    .status-box.info    { background: var(--info-bg);    border: 1px solid var(--info-border); }
 
-    .status-icon { flex-shrink: 0; font-size: 16px; }
+    .status-icon { flex-shrink: 0; font-size: 18px; }
     .status-text { flex: 1; color: var(--text); }
-    .status-text strong { color: var(--navy); }
+    .status-text strong { color: #fff; }
 
     .alt-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .alt-link {
-      font-size: 12px;
-      font-weight: 500;
-      padding: 5px 12px;
+      font-size: 12px; font-weight: 600;
+      padding: 6px 14px;
       border-radius: 8px;
-      background: var(--surface);
+      background: rgba(255,255,255,0.06);
       border: 1px solid var(--border2);
-      color: var(--blue);
+      color: var(--purple-light);
       text-decoration: none;
       transition: all 0.2s;
     }
-    .alt-link:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .alt-link:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
 
     /* Divider */
-    .divider { display: flex; align-items: center; gap: 14px; margin: 32px 0 28px; }
+    .divider { display: flex; align-items: center; gap: 14px; margin: 36px 0 28px; }
     .divider-line { flex: 1; height: 1px; background: var(--border); }
-    .divider-text { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+    .divider-text { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
 
-    /* Feature grid */
+    /* Feature Grid */
     .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 
     .feat {
-      background: var(--bg);
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 20px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.25s;
     }
 
     .feat:hover {
-      border-color: rgba(91,91,214,0.3);
-      box-shadow: 0 4px 16px rgba(91,91,214,0.08);
+      border-color: rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.05);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(139,92,246,0.1);
     }
 
     .feat-icon {
-      width: 38px; height: 38px;
-      background: rgba(91,91,214,0.1);
-      border-radius: 10px;
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.2));
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 18px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(139,92,246,0.2);
     }
 
-    .feat-title { font-size: 13.5px; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
-    .feat-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+    .feat-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .feat-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
 
-    /* ── SECTIONS BELOW ──────────────────── */
+    /* ── SECTIONS ──────────────────────────── */
     .section {
       width: 100%;
-      max-width: 720px;
-      margin-top: 48px;
+      max-width: 760px;
+      margin-top: 60px;
     }
 
     .section-head {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .section-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.2));
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
     }
 
     .section-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 800;
-      color: var(--navy);
+      color: #fff;
       letter-spacing: -0.5px;
     }
 
-    /* Platform support table */
+    /* Platform Grid */
     .platform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
     .p-row {
-      background: var(--surface);
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
+      border-radius: 14px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: border-color 0.2s;
+      transition: all 0.25s;
     }
 
-    .p-row:hover { border-color: rgba(91,91,214,0.3); }
+    .p-row:hover {
+      border-color: rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.04);
+    }
 
     .p-emoji { font-size: 20px; flex-shrink: 0; }
+    .p-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .p-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .p-info { flex: 1; }
-    .p-name { font-size: 13.5px; font-weight: 700; color: var(--navy); }
     .p-tag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px;
       border-radius: 6px;
-      margin-left: auto;
       flex-shrink: 0;
     }
 
-    .p-tag.full    { background: #dcfce7; color: #16a34a; }
-    .p-tag.partial { background: #fef9c3; color: #a16207; }
-    .p-tag.mirror  { background: #eff6ff; color: #2563eb; }
+    .p-tag.full    { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+    .p-tag.article { background: rgba(59,130,246,0.15); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.25); }
+    .p-tag.partial { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+    .p-tag.mirror  { background: rgba(139,92,246,0.15); color: var(--purple-light); border: 1px solid rgba(139,92,246,0.25); }
 
-    /* How it works steps */
+    /* Steps */
     .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 
     .step {
-      background: var(--surface);
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 24px 20px;
+      transition: all 0.25s;
       position: relative;
+    }
+
+    .step:hover {
+      border-color: rgba(139,92,246,0.3);
+      transform: translateY(-3px);
     }
 
     .step-num {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--blue);
-      background: rgba(91,91,214,0.1);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--purple-light);
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.2);
       border-radius: 6px;
       padding: 3px 8px;
       display: inline-block;
       margin-bottom: 14px;
+      letter-spacing: 0.5px;
     }
 
-    .step-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
-    .step-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+    .step-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .step-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
 
-    /* Footer */
+    /* NEW BADGE */
+    .new-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #fff;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    /* ── ARTICLE FEATURE HIGHLIGHT ─────────── */
+    .feature-highlight {
+      width: 100%;
+      max-width: 760px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-top: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-highlight::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #10b981, #06b6d4, #3b82f6);
+    }
+
+    .fh-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fh-desc {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .fh-sites {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .fh-site {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .fh-site:hover {
+      background: rgba(16,185,129,0.1);
+      border-color: rgba(16,185,129,0.3);
+      color: #34d399;
+    }
+
+    /* ── FOOTER ────────────────────────────── */
     footer {
-      margin-top: 64px;
+      margin-top: 80px;
       text-align: center;
-      padding-top: 32px;
+      padding-top: 36px;
       border-top: 1px solid var(--border);
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
     }
 
-    .footer-logo { height: 28px; width: auto; margin-bottom: 12px; opacity: 0.7; }
+    .footer-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .footer-logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .footer-logo-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
 
     .footer-text {
       font-size: 13px;
       color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .footer-version {
+      margin-top: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--purple-light);
+      opacity: 0.6;
     }
 
     /* Spinner */
     .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.3);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: spin 0.65s linear infinite;
       flex-shrink: 0;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Responsive */
-    @media (max-width: 600px) {
-      nav { margin-bottom: 40px; }
-      .card { padding: 22px 16px; }
+    /* ── RESPONSIVE ────────────────────────── */
+    @media (max-width: 700px) {
+      nav { margin-bottom: 44px; padding: 18px 0; }
+      .card { padding: 22px 18px; border-radius: 18px; }
       .input-row { flex-direction: column; }
-      .btn-dl { justify-content: center; }
+      .btn-primary { justify-content: center; }
       .feat-grid, .steps { grid-template-columns: 1fr; }
       .platform-grid { grid-template-columns: 1fr; }
-      h1 { letter-spacing: -1px; }
+      h1 { letter-spacing: -1.5px; }
+      .tabs { flex-direction: column; width: 100%; }
+      .tab-btn { justify-content: center; }
+      .fh-title { font-size: 17px; }
+      .feature-highlight { padding: 22px 18px; }
+    }
+
+    @media (max-width: 400px) {
+      .logo-tagline { display: none; }
+      .nav-badge { display: none; }
     }
   </style>
 </head>
 <body>
+
+<!-- Animated background -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="grid-overlay"></div>
+
 <div class="page">
 
   <!-- NAV -->
   <nav>
     <a class="logo-wrap" href="#">
-      <img src="logo-full.png" alt="Kanmate" class="logo-img"/>
+      <div class="logo-icon-wrap">📄</div>
+      <div class="logo-text-wrap">
+        <span class="logo-name">Kanmate</span>
+        <span class="logo-tagline">PDF &amp; Article Downloader</span>
+      </div>
     </a>
     <div class="nav-right">
-      <span class="nav-badge">PDF Downloader</span>
+      <span class="nav-badge">v1.1</span>
     </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-eyebrow">Smart PDF Downloader</div>
-    <h1>Download Any PDF<br><span class="blue">No Login Required</span></h1>
-    <p class="hero-sub">Paste a link from Scribd, Studocu, Google Drive, Archive.org, Academia.edu and more — Kanmate fetches it through our server proxy, bypassing restrictions.</p>
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      Smart Downloader · Now with Article Support
+    </div>
+    <h1>Download Any <span class="gradient-text">PDF or Article</span><br>Instantly Free</h1>
+    <p class="hero-sub">
+      Paste a link from Scribd, Google Drive, Medium, LinkedIn, Dev.to, Substack, Archive.org and more — Kanmate fetches and delivers it as a clean PDF in seconds.
+    </p>
     <div class="chips">
       <span class="chip">📚 Scribd</span>
       <span class="chip">🎓 Studocu</span>
-      <span class="chip">🔬 Academia.edu</span>
-      <span class="chip">🗄️ Archive.org</span>
       <span class="chip">☁️ Google Drive</span>
+      <span class="chip">🗄️ Archive.org</span>
       <span class="chip">📦 Dropbox</span>
+      <span class="chip new-feature">✍️ Medium</span>
+      <span class="chip new-feature">💼 LinkedIn</span>
+      <span class="chip new-feature">👨‍💻 Dev.to</span>
+      <span class="chip new-feature">📰 Substack</span>
       <span class="chip">🔗 Direct PDF Links</span>
     </div>
   </section>
 
+  <!-- TAB SWITCHER -->
+  <div class="tab-wrap">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-pdf" onclick="switchTab('pdf')">
+        📄 PDF Download
+      </button>
+      <button class="tab-btn" id="tab-article" onclick="switchTab('article')">
+        ✍️ Article to PDF
+        <span class="new-badge">NEW</span>
+      </button>
+    </div>
+  </div>
+
   <!-- MAIN CARD -->
   <div class="card">
-    <div class="input-label">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-      PDF or Document URL
+
+    <div class="input-label" id="inputLabel">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      Paste your PDF URL
     </div>
+
     <div class="input-row">
       <input id="urlInput" class="url-input" type="url"
         placeholder="https://scribd.com/doc/... or any PDF link"
         autocomplete="off" spellcheck="false"/>
-      <button class="btn-dl" id="dlBtn" onclick="startDownload()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
+      <button class="btn-primary" id="dlBtn" onclick="startDownload()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download
       </button>
     </div>
 
     <div class="platform-pill" id="platformPill">
       <span class="platform-pill-dot"></span>
-      <span id="platformText">Platform detected</span>
+      <span id="platformText">Detecting…</span>
     </div>
 
     <div class="progress-wrap" id="progressWrap">
@@ -588,90 +937,186 @@
       <div class="feat">
         <div class="feat-icon">🌐</div>
         <div class="feat-title">Server-Side Proxy</div>
-        <div class="feat-desc">We fetch the file on our server — no CORS blocks, full browser header spoofing</div>
+        <div class="feat-desc">We fetch the file from our server — no CORS blocks, full browser spoofing</div>
       </div>
       <div class="feat">
         <div class="feat-icon">🧠</div>
         <div class="feat-title">Smart Detection</div>
-        <div class="feat-desc">Auto-detects 10+ platforms and applies the right download strategy</div>
+        <div class="feat-desc">Auto-detects 15+ platforms including Medium, LinkedIn, Substack, and Dev.to</div>
       </div>
       <div class="feat">
         <div class="feat-icon">🔒</div>
-        <div class="feat-title">Private & Safe</div>
-        <div class="feat-desc">Files stream directly to you — nothing stored on our servers</div>
+        <div class="feat-title">Private &amp; Safe</div>
+        <div class="feat-desc">Files and articles stream directly to you — nothing stored on our servers</div>
       </div>
+    </div>
+  </div>
+
+  <!-- NEW FEATURE HIGHLIGHT -->
+  <div class="feature-highlight">
+    <div class="fh-title">
+      ✍️ Article Downloader <span class="new-badge">NEW in v1.1</span>
+    </div>
+    <p class="fh-desc">
+      Paste any article link and Kanmate will extract the full text — title, author, body — and generate a clean, beautifully formatted PDF for you to read offline. Works on public articles.
+    </p>
+    <div class="fh-sites">
+      <div class="fh-site">✍️ Medium</div>
+      <div class="fh-site">💼 LinkedIn Pulse</div>
+      <div class="fh-site">👨‍💻 Dev.to</div>
+      <div class="fh-site">📰 Substack</div>
+      <div class="fh-site">📝 Hashnode</div>
+      <div class="fh-site">🌐 WordPress Blogs</div>
+      <div class="fh-site">📋 Notion Pages</div>
+      <div class="fh-site">⚡ Telegra.ph</div>
     </div>
   </div>
 
   <!-- SUPPORTED PLATFORMS -->
   <section class="section">
     <div class="section-head">
+      <div class="section-icon">🗂️</div>
       <div class="section-title">Supported Platforms</div>
     </div>
     <div class="platform-grid">
-      <div class="p-row"><span class="p-emoji">☁️</span><div class="p-info"><div class="p-name">Google Drive</div></div><span class="p-tag full">Full Download</span></div>
-      <div class="p-row"><span class="p-emoji">📦</span><div class="p-info"><div class="p-name">Dropbox</div></div><span class="p-tag full">Full Download</span></div>
-      <div class="p-row"><span class="p-emoji">🗄️</span><div class="p-info"><div class="p-name">Internet Archive</div></div><span class="p-tag full">Full Download</span></div>
-      <div class="p-row"><span class="p-emoji">🔗</span><div class="p-info"><div class="p-name">Direct PDF URLs</div></div><span class="p-tag full">Full Download</span></div>
-      <div class="p-row"><span class="p-emoji">🏫</span><div class="p-info"><div class="p-name">University & Edu Sites</div></div><span class="p-tag full">Full Download</span></div>
-      <div class="p-row"><span class="p-emoji">🔬</span><div class="p-info"><div class="p-name">Academia.edu</div></div><span class="p-tag partial">Best Effort</span></div>
-      <div class="p-row"><span class="p-emoji">📚</span><div class="p-info"><div class="p-name">Scribd</div></div><span class="p-tag mirror">Mirror Links</span></div>
-      <div class="p-row"><span class="p-emoji">🎓</span><div class="p-info"><div class="p-name">Studocu</div></div><span class="p-tag mirror">Alternatives</span></div>
+      <div class="p-row">
+        <span class="p-emoji">☁️</span>
+        <div class="p-info"><div class="p-name">Google Drive</div><div class="p-sub">Shared file links</div></div>
+        <span class="p-tag full">Full PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">📦</span>
+        <div class="p-info"><div class="p-name">Dropbox</div><div class="p-sub">Public share links</div></div>
+        <span class="p-tag full">Full PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">🗄️</span>
+        <div class="p-info"><div class="p-name">Internet Archive</div><div class="p-sub">archive.org books & docs</div></div>
+        <span class="p-tag full">Full PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">🔗</span>
+        <div class="p-info"><div class="p-name">Direct PDF URLs</div><div class="p-sub">Any .pdf link online</div></div>
+        <span class="p-tag full">Full PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">✍️</span>
+        <div class="p-info"><div class="p-name">Medium</div><div class="p-sub">Articles & stories</div></div>
+        <span class="p-tag article">Article PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">💼</span>
+        <div class="p-info"><div class="p-name">LinkedIn Pulse</div><div class="p-sub">Professional articles</div></div>
+        <span class="p-tag article">Article PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">👨‍💻</span>
+        <div class="p-info"><div class="p-name">Dev.to</div><div class="p-sub">Tech articles</div></div>
+        <span class="p-tag article">Article PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">📰</span>
+        <div class="p-info"><div class="p-name">Substack</div><div class="p-sub">Newsletters & posts</div></div>
+        <span class="p-tag article">Article PDF</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">🔬</span>
+        <div class="p-info"><div class="p-name">Academia.edu</div><div class="p-sub">Research papers</div></div>
+        <span class="p-tag partial">Best Effort</span>
+      </div>
+      <div class="p-row">
+        <span class="p-emoji">📚</span>
+        <div class="p-info"><div class="p-name">Scribd</div><div class="p-sub">Documents & books</div></div>
+        <span class="p-tag mirror">Mirror Links</span>
+      </div>
     </div>
   </section>
 
   <!-- HOW IT WORKS -->
   <section class="section">
     <div class="section-head">
+      <div class="section-icon">⚙️</div>
       <div class="section-title">How It Works</div>
     </div>
     <div class="steps">
       <div class="step">
         <div class="step-num">Step 01</div>
         <div class="step-title">Paste the Link</div>
-        <div class="step-desc">Copy any PDF or document URL and paste it into Kanmate</div>
+        <div class="step-desc">Copy any PDF or article URL and paste it into the Kanmate input box</div>
       </div>
       <div class="step">
         <div class="step-num">Step 02</div>
-        <div class="step-title">Proxy Fetches It</div>
-        <div class="step-desc">Our server requests the file with smart headers — no CORS, no browser blocks</div>
+        <div class="step-title">Server Fetches It</div>
+        <div class="step-desc">Our server requests the file or extracts the article text with smart headers</div>
       </div>
       <div class="step">
         <div class="step-num">Step 03</div>
-        <div class="step-title">File Downloads</div>
-        <div class="step-desc">The PDF streams straight to your downloads folder, ready to use</div>
+        <div class="step-title">PDF Downloads</div>
+        <div class="step-desc">A clean, formatted PDF streams straight to your downloads folder instantly</div>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <img src="logo-full.png" alt="Kanmate" class="footer-logo"/>
-    <div class="footer-text">Smart PDF Downloader · Free to use · Files are never stored</div>
+    <div class="footer-logo-wrap">
+      <div class="footer-logo-icon">📄</div>
+      <span class="footer-logo-name">Kanmate</span>
+    </div>
+    <div class="footer-text">Smart PDF &amp; Article Downloader · Free to use · Files are never stored</div>
+    <div class="footer-version">v1.1.0 · kanmate.vercel.app</div>
   </footer>
 
 </div>
 
 <script>
+  // ── Config ──────────────────────────────────────────────
   const PLATFORM_LABELS = {
-    scribd: '📚 Scribd detected',
-    studocu: '🎓 Studocu detected',
+    scribd:   '📚 Scribd detected',
+    studocu:  '🎓 Studocu detected',
     academia: '🔬 Academia.edu detected',
-    slideshare: '📊 SlideShare detected',
-    dropbox: '📦 Dropbox detected',
-    gdrive: '☁️ Google Drive detected',
+    slideshare:'📊 SlideShare detected',
+    dropbox:  '📦 Dropbox detected',
+    gdrive:   '☁️ Google Drive detected',
     onedrive: '💾 OneDrive detected',
-    archive: '🗄️ Internet Archive detected',
-    researchgate: '🔬 ResearchGate detected',
-    direct: '🔗 Direct PDF link',
-    generic: '🌐 Generic URL'
+    archive:  '🗄️ Internet Archive detected',
+    researchgate:'🔬 ResearchGate detected',
+    direct:   '🔗 Direct PDF link',
+    article:  '✍️ Article detected — will extract as PDF',
+    generic:  '🌐 Generic URL'
   };
+
+  const ARTICLE_PLATFORMS = ['article'];
+  let currentMode = 'pdf'; // 'pdf' | 'article'
 
   const urlInput = document.getElementById('urlInput');
 
-  urlInput.addEventListener('input', debounce(detectPlatform, 450));
+  urlInput.addEventListener('input', debounce(detectPlatform, 400));
   urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') startDownload(); });
 
+  // ── Tab Switcher ─────────────────────────────────────────
+  function switchTab(mode) {
+    currentMode = mode;
+    document.getElementById('tab-pdf').classList.toggle('active', mode === 'pdf');
+    document.getElementById('tab-article').classList.toggle('active', mode === 'article');
+
+    const label = document.getElementById('inputLabel');
+    const input = document.getElementById('urlInput');
+
+    if (mode === 'article') {
+      label.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Paste an Article URL`;
+      input.placeholder = 'https://medium.com/... or linkedin.com/pulse/...';
+    } else {
+      label.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Paste your PDF URL`;
+      input.placeholder = 'https://scribd.com/doc/... or any PDF link';
+    }
+
+    // Re-detect if URL already present
+    if (urlInput.value.trim()) detectPlatform();
+    document.getElementById('statusArea').innerHTML = '';
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
   function debounce(fn, ms) {
     let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
   }
@@ -681,10 +1126,15 @@
     const pill = document.getElementById('platformPill');
     if (!url || !url.startsWith('http')) { pill.classList.remove('show'); return; }
     try {
-      const r = await fetch('/api/detect', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url}) });
+      const r = await fetch('/api/detect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
       const d = await r.json();
+      const isArticle = d.platform === 'article';
       document.getElementById('platformText').textContent = PLATFORM_LABELS[d.platform] || d.platform;
       pill.classList.add('show');
+      pill.classList.toggle('article-mode', isArticle);
+      // Auto-switch tab based on detected platform
+      if (isArticle && currentMode === 'pdf') switchTab('article');
+      else if (!isArticle && d.platform !== 'generic' && currentMode === 'article') switchTab('pdf');
     } catch {}
   }
 
@@ -709,21 +1159,22 @@
       <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
     </svg> Download`;
 
+  // ── Main Download ─────────────────────────────────────────
   async function startDownload() {
     const url = urlInput.value.trim();
     const btn = document.getElementById('dlBtn');
 
-    if (!url) { setStatus('warn', '⚠️', 'Please paste a PDF link first.'); return; }
-    try { new URL(url); } catch { setStatus('error', '✖', 'That doesn\'t look like a valid URL.'); return; }
+    if (!url) { setStatus('warn', '⚠️', 'Please paste a URL first.'); return; }
+    try { new URL(url); } catch { setStatus('error', '✖', "That doesn't look like a valid URL."); return; }
 
     btn.disabled = true;
-    btn.innerHTML = `<div class="spinner"></div> Fetching…`;
+    btn.innerHTML = `<div class="spinner"></div> ${currentMode === 'article' ? 'Extracting…' : 'Fetching…'}`;
     showProgress(true);
     setProgress(10, 'Connecting…');
     document.getElementById('statusArea').innerHTML = '';
 
     try {
-      setProgress(30, 'Sending to proxy…');
+      setProgress(30, currentMode === 'article' ? 'Extracting article content…' : 'Sending to proxy…');
 
       const res = await fetch('/api/fetch', {
         method: 'POST',
@@ -731,7 +1182,7 @@
         body: JSON.stringify({ url })
       });
 
-      setProgress(60, 'Receiving file…');
+      setProgress(65, currentMode === 'article' ? 'Generating PDF…' : 'Receiving file…');
       const ct = res.headers.get('content-type') || '';
 
       if (ct.includes('application/json')) {
@@ -743,7 +1194,7 @@
             `<a class="alt-link" href="${a}" target="_blank" rel="noopener">🔗 Mirror</a>`
           ).join('');
           setStatus('warn', '📚',
-            `<strong>Scribd</strong> uses DRM — direct download isn't possible without a premium account.<br>Try these mirrors:
+            `<strong>Scribd</strong> uses DRM — direct download requires a premium account.<br>Try these mirrors:
             <div class="alt-links">${alts}
               <a class="alt-link" href="https://downloader.la/?url=${encodeURIComponent(url)}" target="_blank">🌐 Downloader.la</a>
               <a class="alt-link" href="https://www.pdfdrive.com/" target="_blank">📚 PDF Drive</a>
@@ -757,13 +1208,14 @@
             <div class="alt-links">
               <a class="alt-link" href="https://www.coursehero.com/" target="_blank">📖 Course Hero</a>
               <a class="alt-link" href="https://www.pdfdrive.com/" target="_blank">📚 PDF Drive</a>
-              <a class="alt-link" href="${url}" target="_blank">🔗 Open Original</a>
             </div>`);
           return;
         }
 
-        setStatus('error', '✖', data.message || data.error || 'Download failed.');
-        return;
+        if (!res.ok) {
+          setStatus('error', '✖', data.message || data.error || 'Download failed.');
+          return;
+        }
       }
 
       if (!res.ok) { throw new Error(`Server error ${res.status}`); }
@@ -771,9 +1223,9 @@
       const xFilename = res.headers.get('x-kanmate-filename') || '';
       const cd = res.headers.get('content-disposition') || '';
       const m = cd.match(/filename="?([^";\n]+)"?/);
-      let filename = xFilename || (m ? m[1] : 'kanmate-document.pdf');
+      let filename = xFilename || (m ? m[1] : (currentMode === 'article' ? 'article.pdf' : 'kanmate-document.pdf'));
 
-      setProgress(88, 'Preparing download…');
+      setProgress(90, 'Preparing download…');
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -787,13 +1239,14 @@
       setProgress(100, 'Done!');
       setTimeout(() => showProgress(false), 1500);
       const mb = (blob.size / 1024 / 1024).toFixed(2);
-      setStatus('success', '✅', `<strong>${filename}</strong> downloaded successfully! (${mb} MB)`);
+      const icon = currentMode === 'article' ? '📄' : '✅';
+      setStatus('success', icon, `<strong>${filename}</strong> downloaded successfully! (${mb} MB)`);
 
     } catch (err) {
       showProgress(false);
       const msg = String(err.message || err);
       if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-        setStatus('error', '🔌', 'Cannot reach the Kanmate server. Make sure it\'s running on port 3000.');
+        setStatus('error', '🔌', 'Cannot reach the Kanmate server. Make sure it\'s running.');
       } else {
         setStatus('error', '✖', 'Download failed: ' + msg);
       }

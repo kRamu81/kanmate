@@ -3,6 +3,9 @@ const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
 const cheerio = require('cheerio');
+const { Readability } = require('@mozilla/readability');
+const { JSDOM } = require('jsdom');
+const PDFDocument = require('pdfkit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,10 +15,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─────────────────────────────────────────────
-// Site-specific extractors
+// Platform Detection
 // ─────────────────────────────────────────────
-
-// Detect which platform a URL belongs to
 function detectPlatform(url) {
   const u = url.toLowerCase();
   if (u.includes('scribd.com'))       return 'scribd';
@@ -30,11 +31,21 @@ function detectPlatform(url) {
   if (u.includes('sharepoint.com'))   return 'sharepoint';
   if (u.includes('researchgate.net')) return 'researchgate';
   if (u.includes('archive.org'))      return 'archive';
+  if (u.includes('medium.com'))       return 'article';
+  if (u.includes('linkedin.com/pulse') || u.includes('linkedin.com/posts')) return 'article';
+  if (u.includes('dev.to'))           return 'article';
+  if (u.includes('hashnode.com') || u.includes('hashnode.dev')) return 'article';
+  if (u.includes('substack.com'))     return 'article';
+  if (u.includes('notion.so') || u.includes('notion.site')) return 'article';
+  if (u.includes('telegraph.ph'))     return 'article';
+  if (u.includes('wordpress.com') || u.includes('blogspot.com')) return 'article';
   if (u.endsWith('.pdf') || u.includes('.pdf?') || u.includes('/pdf/')) return 'direct';
   return 'generic';
 }
 
-// Common browser-like headers
+// ─────────────────────────────────────────────
+// Browser-like headers
+// ─────────────────────────────────────────────
 function browserHeaders(referer = '') {
   return {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -54,67 +65,151 @@ function browserHeaders(referer = '') {
   };
 }
 
-// ── Google Drive ──────────────────────────────
+// ─────────────────────────────────────────────
+// URL Transformers
+// ─────────────────────────────────────────────
 function transformGDriveUrl(url) {
-  // /file/d/FILE_ID/view → /uc?export=download&id=FILE_ID
   const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (match) {
-    return `https://drive.google.com/uc?export=download&id=${match[1]}`;
-  }
-  // Already a direct download link
+  if (match) return `https://drive.google.com/uc?export=download&id=${match[1]}`;
   if (url.includes('uc?export=download')) return url;
   return null;
 }
 
-// ── Dropbox ───────────────────────────────────
 function transformDropboxUrl(url) {
   return url
     .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
     .replace('?dl=0', '?dl=1')
-    .replace('?dl=0', '')
     + (url.includes('?') ? '&dl=1' : '?dl=1');
 }
 
-// ── OneDrive ──────────────────────────────────
-function transformOneDriveUrl(url) {
-  if (url.includes('1drv.ms') || url.includes('onedrive.live.com')) {
-    // Convert share link to download
-    const encoded = encodeURIComponent(url);
-    return `https://api.onedrive.com/v1.0/shares/u!${Buffer.from(url).toString('base64')}/root/content`;
-  }
-  return url;
-}
-
-// ── Internet Archive ──────────────────────────
 async function extractArchive(url) {
-  // archive.org details page → get raw file
   const match = url.match(/archive\.org\/details\/([^/?]+)/);
   if (match) {
     const id = match[1];
-    const metaUrl = `https://archive.org/metadata/${id}`;
-    const { data } = await axios.get(metaUrl, { timeout: 15000 });
-    const files = data.files || [];
-    const pdf = files.find(f => f.name && f.name.endsWith('.pdf'));
-    if (pdf) {
-      return `https://archive.org/download/${id}/${pdf.name}`;
-    }
+    const { data } = await axios.get(`https://archive.org/metadata/${id}`, { timeout: 15000 });
+    const pdf = (data.files || []).find(f => f.name && f.name.endsWith('.pdf'));
+    if (pdf) return `https://archive.org/download/${id}/${pdf.name}`;
   }
   return null;
 }
 
-// ── Scribd ────────────────────────────────────
+// ─────────────────────────────────────────────
+// Article Extractor (Medium, LinkedIn, etc.)
+// ─────────────────────────────────────────────
+async function extractArticle(url) {
+  const { data: html } = await axios.get(url, {
+    headers: browserHeaders(),
+    timeout: 20000,
+    responseType: 'text',
+  });
+
+  const dom = new JSDOM(html, { url });
+  const reader = new Readability(dom.window.document);
+  const article = reader.parse();
+
+  if (!article || !article.textContent || article.textContent.trim().length < 100) {
+    return null;
+  }
+
+  return {
+    title: article.title || 'Article',
+    byline: article.byline || '',
+    siteName: article.siteName || new URL(url).hostname,
+    textContent: article.textContent.trim(),
+    excerpt: article.excerpt || '',
+  };
+}
+
+// ─────────────────────────────────────────────
+// PDF Generator from article text
+// ─────────────────────────────────────────────
+function generateArticlePDF(article, res) {
+  const doc = new PDFDocument({
+    margin: 60,
+    size: 'A4',
+    info: {
+      Title: article.title,
+      Author: article.byline || 'Kanmate',
+      Subject: article.excerpt,
+    }
+  });
+
+  // Filename
+  const safeTitle = article.title.replace(/[^a-zA-Z0-9 ]/g, '').trim().slice(0, 60) || 'article';
+  const filename = `${safeTitle}.pdf`;
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('X-Kanmate-Filename', filename);
+  res.setHeader('X-Kanmate-Platform', 'article');
+
+  doc.pipe(res);
+
+  // ── Header ──
+  doc.rect(0, 0, doc.page.width, 120).fill('#0f0f23');
+
+  doc.fill('#a78bfa')
+     .fontSize(9)
+     .font('Helvetica-Bold')
+     .text('KANMATE · ARTICLE DOWNLOAD', 60, 30, { align: 'left' });
+
+  doc.fill('#ffffff')
+     .fontSize(20)
+     .font('Helvetica-Bold')
+     .text(article.title, 60, 50, { width: doc.page.width - 120, align: 'left' });
+
+  // ── Meta ──
+  doc.moveDown(3);
+
+  if (article.byline) {
+    doc.fill('#6b7280').fontSize(10).font('Helvetica')
+       .text(`By ${article.byline}`, { align: 'left' });
+    doc.moveDown(0.3);
+  }
+
+  doc.fill('#9ca3af').fontSize(9)
+     .text(`Source: ${article.siteName}`, { align: 'left' });
+
+  doc.moveDown(1);
+  doc.moveTo(60, doc.y).lineTo(doc.page.width - 60, doc.y).stroke('#e5e7eb');
+  doc.moveDown(1);
+
+  // ── Body ──
+  const paragraphs = article.textContent
+    .split(/\n{2,}/)
+    .map(p => p.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter(p => p.length > 30);
+
+  doc.fill('#1f2937').fontSize(12).font('Helvetica').lineGap(4);
+
+  for (const para of paragraphs) {
+    if (doc.y > doc.page.height - 100) doc.addPage();
+    doc.text(para, { align: 'justify' });
+    doc.moveDown(0.8);
+  }
+
+  // ── Footer ──
+  doc.moveDown(2);
+  doc.moveTo(60, doc.y).lineTo(doc.page.width - 60, doc.y).stroke('#e5e7eb');
+  doc.moveDown(0.5);
+  doc.fill('#9ca3af').fontSize(8)
+     .text(`Downloaded via Kanmate · kanmate.vercel.app · ${new Date().toLocaleDateString()}`, { align: 'center' });
+
+  doc.end();
+  return filename;
+}
+
+// ─────────────────────────────────────────────
+// Platform-specific: Scribd
+// ─────────────────────────────────────────────
 async function extractScribd(url) {
-  // Try to find the document ID and use a known extraction technique
   const match = url.match(/scribd\.com\/(?:doc|document)\/(\d+)/);
   if (!match) return null;
   const docId = match[1];
-  // Use the Scribd embed URL which sometimes serves the PDF content
-  // Also try the download24h style mirror sites
   return {
     type: 'info',
     docId,
-    embedUrl: `https://www.scribd.com/embeds/${docId}/content?start_page=1&view_mode=scroll&show_related_documents=true`,
-    message: 'Scribd requires account authentication. Try: scribd.vpdfs.com or downloader.la for this document.',
+    message: 'Scribd requires account authentication.',
     alternatives: [
       `https://scribd.vpdfs.com/view/${docId}`,
       `https://www.pdfdrive.com/?q=scribd+${docId}`,
@@ -122,52 +217,60 @@ async function extractScribd(url) {
   };
 }
 
-// ── Studocu ───────────────────────────────────
+// ─────────────────────────────────────────────
+// Platform-specific: Studocu
+// ─────────────────────────────────────────────
 async function extractStudocu(url) {
   try {
-    const { data } = await axios.get(url, {
-      headers: browserHeaders(),
-      timeout: 15000
-    });
+    const { data } = await axios.get(url, { headers: browserHeaders(), timeout: 15000 });
     const $ = cheerio.load(data);
-    // Look for PDF download links in page
     let pdfUrl = null;
     $('a[href]').each((_, el) => {
       const href = $(el).attr('href') || '';
       if (href.includes('.pdf')) { pdfUrl = href; return false; }
     });
-    // Try meta tags
     const og = $('meta[property="og:url"]').attr('content');
-    return { type: 'info', pdfUrl, pageUrl: og || url, message: 'Studocu requires login to download. Document preview only.' };
+    return { type: 'info', pdfUrl, pageUrl: og || url, message: 'Studocu requires login to download.' };
   } catch {
     return null;
   }
 }
 
 // ─────────────────────────────────────────────
-// Main proxy fetch endpoint
+// API: /api/fetch
 // ─────────────────────────────────────────────
 app.post('/api/fetch', async (req, res) => {
   const { url } = req.body;
-
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   let targetUrl = url.trim();
   const platform = detectPlatform(targetUrl);
 
-  console.log(`[Kanmate] Fetching: ${targetUrl} (platform: ${platform})`);
+  console.log(`[Kanmate v1.1] Fetching: ${targetUrl} (platform: ${platform})`);
 
   try {
-    // ── Platform-specific transformations ──────
+    // ── Article extraction ─────────────────────
+    if (platform === 'article') {
+      const article = await extractArticle(targetUrl);
+      if (!article) {
+        return res.status(422).json({
+          error: 'Could not extract article content.',
+          message: 'The article may be behind a paywall or the page did not have enough readable content.',
+          platform
+        });
+      }
+      generateArticlePDF(article, res);
+      return;
+    }
+
+    // ── Platform transforms ────────────────────
     if (platform === 'gdrive') {
       const direct = transformGDriveUrl(targetUrl);
       if (!direct) return res.status(400).json({ error: 'Could not parse Google Drive URL.' });
       targetUrl = direct;
     }
 
-    if (platform === 'dropbox') {
-      targetUrl = transformDropboxUrl(targetUrl);
-    }
+    if (platform === 'dropbox') targetUrl = transformDropboxUrl(targetUrl);
 
     if (platform === 'archive') {
       const extracted = await extractArchive(targetUrl);
@@ -184,17 +287,14 @@ app.post('/api/fetch', async (req, res) => {
       if (info) return res.json({ platform: 'studocu', ...info });
     }
 
-    // ── Generic / Direct fetch ─────────────────
+    // ── Generic / Direct PDF fetch ─────────────
     const response = await axios({
       method: 'GET',
       url: targetUrl,
       responseType: 'stream',
       timeout: 60000,
       maxRedirects: 10,
-      headers: {
-        ...browserHeaders(),
-        'Accept': 'application/pdf,application/octet-stream,*/*',
-      },
+      headers: { ...browserHeaders(), 'Accept': 'application/pdf,application/octet-stream,*/*' },
       validateStatus: status => status < 400,
     });
 
@@ -208,13 +308,14 @@ app.post('/api/fetch', async (req, res) => {
     if (cdMatch) {
       filename = cdMatch[1].replace(/['"]/g, '').trim();
     } else {
-      const urlPath = new URL(targetUrl).pathname;
-      const urlFile = urlPath.split('/').pop();
-      if (urlFile && urlFile.includes('.')) filename = decodeURIComponent(urlFile);
+      try {
+        const urlPath = new URL(targetUrl).pathname;
+        const urlFile = urlPath.split('/').pop();
+        if (urlFile && urlFile.includes('.')) filename = decodeURIComponent(urlFile);
+      } catch {}
     }
     if (!filename.toLowerCase().endsWith('.pdf')) filename += '.pdf';
 
-    // Stream back to client
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     if (contentLength) res.setHeader('Content-Length', contentLength);
@@ -222,37 +323,28 @@ app.post('/api/fetch', async (req, res) => {
     res.setHeader('X-Kanmate-Platform', platform);
 
     response.data.pipe(res);
-
-    response.data.on('error', (err) => {
-      console.error('[Kanmate] Stream error:', err.message);
-    });
+    response.data.on('error', err => console.error('[Kanmate] Stream error:', err.message));
 
   } catch (err) {
     console.error('[Kanmate] Error:', err.message);
-
     if (err.response) {
       const status = err.response.status;
       if (status === 401 || status === 403) {
         return res.status(403).json({
           error: 'Access denied',
-          message: `The server returned ${status}. This document requires authentication that cannot be bypassed.`,
+          message: `The server returned ${status}. This document requires authentication.`,
           platform
         });
       }
-      if (status === 404) {
-        return res.status(404).json({ error: 'File not found (404)', platform });
-      }
+      if (status === 404) return res.status(404).json({ error: 'File not found (404)', platform });
     }
-
-    return res.status(500).json({
-      error: 'Fetch failed',
-      message: err.message,
-      platform
-    });
+    return res.status(500).json({ error: 'Fetch failed', message: err.message, platform });
   }
 });
 
-// Info endpoint — returns platform detection without fetching
+// ─────────────────────────────────────────────
+// API: /api/detect
+// ─────────────────────────────────────────────
 app.post('/api/detect', (req, res) => {
   const { url } = req.body;
   if (!url) return res.status(400).json({ error: 'URL required' });
@@ -260,12 +352,14 @@ app.post('/api/detect', (req, res) => {
   res.json({ platform });
 });
 
-// Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'Kanmate' }));
+// ─────────────────────────────────────────────
+// API: /api/health
+// ─────────────────────────────────────────────
+app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'Kanmate', version: '1.1.0' }));
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
-    console.log(`\n🚀 Kanmate server running at http://localhost:${PORT}\n`);
+    console.log(`\n🚀 Kanmate v1.1 running at http://localhost:${PORT}\n`);
   });
 }
 
