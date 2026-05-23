@@ -355,11 +355,79 @@ app.post('/api/detect', (req, res) => {
 // ─────────────────────────────────────────────
 // API: /api/health
 // ─────────────────────────────────────────────
-app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'Kanmate', version: '1.1.0' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'Kanmate', version: '2.0.0' }));
+
+// ─────────────────────────────────────────────
+// In-memory bookings store (resets on restart)
+// ─────────────────────────────────────────────
+const bookings = [];
+
+const SERVICES = [
+  { id: 'pet',      name: 'Pet Grooming',      icon: '🐾', price: 399,  unit: 'session', description: 'Certified groomers at your doorstep.' },
+  { id: 'car',      name: 'Car Detailing',      icon: '🚗', price: 799,  unit: 'session', description: 'Mobile detailing — we come to you.' },
+  { id: 'cleaning', name: 'Home Cleaning',      icon: '🏠', price: 999,  unit: 'month',   description: 'Weekly/bi-weekly cleaning with subscription savings.' },
+  { id: 'beauty',   name: 'Beauty & Wellness',  icon: '💅', price: 499,  unit: 'session', description: 'At-home haircuts, facials, massage, and more.' },
+];
+
+const PLANS = [
+  { id: 'basic',    name: 'Basic',    priceInr: 999,  cleanings: 1, bhk: '1–2 BHK', deepClean: false, laundry: false },
+  { id: 'standard', name: 'Standard', priceInr: 1999, cleanings: 2, bhk: '2–3 BHK', deepClean: true,  laundry: false, popular: true },
+  { id: 'premium',  name: 'Premium',  priceInr: 3499, cleanings: 4, bhk: '4+ BHK',  deepClean: true,  laundry: true },
+];
+
+// GET /api/services
+app.get('/api/services', (req, res) => res.json({ services: SERVICES }));
+
+// GET /api/services/:id
+app.get('/api/services/:id', (req, res) => {
+  const svc = SERVICES.find(s => s.id === req.params.id);
+  if (!svc) return res.status(404).json({ error: 'Service not found' });
+  res.json(svc);
+});
+
+// GET /api/plans
+app.get('/api/plans', (req, res) => res.json({ plans: PLANS }));
+
+// POST /api/bookings
+app.post('/api/bookings', (req, res) => {
+  const { service, date, time, name, phone, address, notes, bookingId } = req.body;
+  if (!service || !date || !time || !name || !phone || !address) {
+    return res.status(400).json({ error: 'Missing required fields: service, date, time, name, phone, address' });
+  }
+  const booking = {
+    id: bookingId || ('KM-' + Math.random().toString(36).slice(2,8).toUpperCase()),
+    service, date, time, name, phone, address,
+    notes: notes || '',
+    status: 'confirmed',
+    createdAt: new Date().toISOString(),
+  };
+  bookings.push(booking);
+  console.log(`[Kanmate v2.0] New booking: ${booking.id} — ${service} for ${name} on ${date} at ${time}`);
+  res.status(201).json({ success: true, booking });
+});
+
+// GET /api/bookings (admin - returns all)
+app.get('/api/bookings', (req, res) => res.json({ count: bookings.length, bookings }));
+
+// POST /api/subscribe
+app.post('/api/subscribe', (req, res) => {
+  const { plan, name, phone, address } = req.body;
+  if (!plan || !name || !phone) return res.status(400).json({ error: 'plan, name, and phone are required' });
+  const found = PLANS.find(p => p.id === plan);
+  if (!found) return res.status(404).json({ error: 'Plan not found' });
+  const sub = {
+    id: 'SUB-' + Math.random().toString(36).slice(2,8).toUpperCase(),
+    plan, name, phone, address: address || '',
+    status: 'active',
+    startDate: new Date().toISOString(),
+  };
+  console.log(`[Kanmate v2.0] New subscription: ${sub.id} — ${plan} for ${name}`);
+  res.status(201).json({ success: true, subscription: sub });
+});
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
-    console.log(`\n🚀 Kanmate v1.1 running at http://localhost:${PORT}\n`);
+    console.log(`\n🚀 Kanmate v2.0 running at http://localhost:${PORT}\n`);
   });
 }
 
