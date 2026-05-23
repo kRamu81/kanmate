@@ -1,0 +1,22 @@
+{
+  "name": "kanmate",
+  "version": "1.0.0",
+  "description": "Smart PDF downloader with server-side proxy",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.16.1",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-fetch": "^2.7.0",
+    "playwright": "^1.60.0",
+    "puppeteer-core": "^25.0.4"
+  }
+}

@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kanmate — Smart PDF Downloader | Download Any PDF Free</title>
+  <meta name="description" content="Kanmate is a smart PDF downloader that fetches documents from Scribd, Studocu, Google Drive, Archive.org, Academia.edu, and more without requiring a login."/>
+  <meta name="keywords" content="PDF downloader, Scribd downloader, Studocu downloader, Academia.edu downloader, bypass restrictions, free PDF download"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:title" content="Kanmate — Smart PDF Downloader"/>
+  <meta property="og:description" content="Download any PDF from Scribd, Studocu, Google Drive, and more. No login required."/>
+  <meta property="og:type" content="website"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Kanmate — Smart PDF Downloader"/>
+  <meta name="twitter:description" content="Download any PDF from Scribd, Studocu, Google Drive, and more. No login required."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #5B5BD6;
+      --blue-light: #7B7FE8;
+      --blue-dark: #4747b8;
+      --navy: #1a1d2e;
+      --navy-soft: #252840;
+      --bg: #f5f6ff;
+      --bg2: #eef0fc;
+      --surface: #ffffff;
+      --border: #e2e4f3;
+      --border2: #d0d3ee;
+      --text: #1a1d2e;
+      --text2: #4a4e6b;
+      --muted: #8b8fad;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --warn: #d97706;
+      --warn-bg: #fffbeb;
+      --warn-border: #fde68a;
+      --error: #dc2626;
+      --error-bg: #fef2f2;
+      --error-border: #fecaca;
+      --info-bg: #eff6ff;
+      --info-border: #bfdbfe;
+      --info: #2563eb;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle at 20% 10%, rgba(91,91,214,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 90%, rgba(91,91,214,0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px 80px;
+    }
+
+    /* ── NAV ─────────────────────────────── */
+    nav {
+      width: 100%;
+      max-width: 920px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 64px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-img {
+      height: 36px;
+      width: auto;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--blue);
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── HERO ────────────────────────────── */
+    .hero {
+      width: 100%;
+      max-width: 680px;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(91,91,214,0.1);
+      border: 1px solid rgba(91,91,214,0.2);
+      margin-bottom: 24px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--blue);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    h1 {
+      font-size: clamp(32px, 5.5vw, 54px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--navy);
+      margin-bottom: 18px;
+    }
+
+    h1 .blue { color: var(--blue); }
+
+    .hero-sub {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text2);
+      max-width: 520px;
+      margin: 0 auto 28px;
+      font-weight: 400;
+    }
+
+    /* Platform chips */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .chip {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      transition: all 0.2s;
+      cursor: default;
+    }
+
+    .chip:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(91,91,214,0.05);
+    }
+
+    /* ── MAIN CARD ───────────────────────── */
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 4px 6px rgba(91,91,214,0.04), 0 20px 60px rgba(91,91,214,0.08), 0 0 0 1px rgba(255,255,255,0.8) inset;
+      margin-bottom: 32px;
+    }
+
+    .input-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 10px;
+      letter-spacing: -0.1px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .url-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--navy);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      min-width: 0;
+    }
+
+    .url-input::placeholder { color: var(--muted); }
+
+    .url-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(91,91,214,0.12);
+      background: #fff;
+    }
+
+    .btn-dl {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 26px;
+      background: var(--blue);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(91,91,214,0.35);
+      letter-spacing: -0.2px;
+    }
+
+    .btn-dl:hover {
+      background: var(--blue-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(91,91,214,0.4);
+    }
+
+    .btn-dl:active { transform: translateY(0); }
+    .btn-dl:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    /* Platform detect badge */
+    .platform-pill {
+      display: none;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--blue);
+    }
+
+    .platform-pill.show { display: flex; }
+    .platform-pill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+
+    /* Progress */
+    .progress-wrap { display: none; margin-top: 18px; }
+    .progress-wrap.show { display: block; }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      height: 5px;
+      background: var(--bg2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--blue-light));
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Status messages */
+    .status-area { margin-top: 18px; }
+
+    .status-box {
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: fadeUp 0.25s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-box.success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success); }
+    .status-box.error   { background: var(--error-bg);   border: 1px solid var(--error-border);   color: var(--error); }
+    .status-box.warn    { background: var(--warn-bg);    border: 1px solid var(--warn-border);    color: var(--warn); }
+    .status-box.info    { background: var(--info-bg);    border: 1px solid var(--info-border);    color: var(--info); }
+
+    .status-icon { flex-shrink: 0; font-size: 16px; }
+    .status-text { flex: 1; color: var(--text); }
+    .status-text strong { color: var(--navy); }
+
+    .alt-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .alt-link {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      color: var(--blue);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .alt-link:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+    /* Divider */
+    .divider { display: flex; align-items: center; gap: 14px; margin: 32px 0 28px; }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* Feature grid */
+    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+    .feat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .feat:hover {
+      border-color: rgba(91,91,214,0.3);
+      box-shadow: 0 4px 16px rgba(91,91,214,0.08);
+    }
+
+    .feat-icon {
+      width: 38px; height: 38px;
+      background: rgba(91,91,214,0.1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .feat-title { font-size: 13.5px; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+    .feat-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+    /* ── SECTIONS BELOW ──────────────────── */
+    .section {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 48px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+    }
+
+    /* Platform support table */
+    .platform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    .p-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .p-row:hover { border-color: rgba(91,91,214,0.3); }
+
+    .p-emoji { font-size: 20px; flex-shrink: 0; }
+    .p-info { flex: 1; }
+    .p-name { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+    .p-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .p-tag.full    { background: #dcfce7; color: #16a34a; }
+    .p-tag.partial { background: #fef9c3; color: #a16207; }
+    .p-tag.mirror  { background: #eff6ff; color: #2563eb; }
+
+    /* How it works steps */
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 20px;
+      position: relative;
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(91,91,214,0.1);
+      border-radius: 6px;
+      padding: 3px 8px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .step-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .step-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+    /* Footer */
+    footer {
+      margin-top: 64px;
+      text-align: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .footer-logo { height: 28px; width: auto; margin-bottom: 12px; opacity: 0.7; }
+
+    .footer-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      nav { margin-bottom: 40px; }
+      .card { padding: 22px 16px; }
+      .input-row { flex-direction: column; }
+      .btn-dl { justify-content: center; }
+      .feat-grid, .steps { grid-template-columns: 1fr; }
+      .platform-grid { grid-template-columns: 1fr; }
+      h1 { letter-spacing: -1px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo-wrap" href="#">
+      <img src="logo-full.png" alt="Kanmate" class="logo-img"/>
+    </a>
+    <div class="nav-right">
+      <span class="nav-badge">PDF Downloader</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Smart PDF Downloader</div>
+    <h1>Download Any PDF<br><span class="blue">No Login Required</span></h1>
+    <p class="hero-sub">Paste a link from Scribd, Studocu, Google Drive, Archive.org, Academia.edu and more — Kanmate fetches it through our server proxy, bypassing restrictions.</p>
+    <div class="chips">
+      <span class="chip">📚 Scribd</span>
+      <span class="chip">🎓 Studocu</span>
+      <span class="chip">🔬 Academia.edu</span>
+      <span class="chip">🗄️ Archive.org</span>
+      <span class="chip">☁️ Google Drive</span>
+      <span class="chip">📦 Dropbox</span>
+      <span class="chip">🔗 Direct PDF Links</span>
+    </div>
+  </section>
+
+  <!-- MAIN CARD -->
+  <div class="card">
+    <div class="input-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      PDF or Document URL
+    </div>
+    <div class="input-row">
+      <input id="urlInput" class="url-input" type="url"
+        placeholder="https://scribd.com/doc/... or any PDF link"
+        autocomplete="off" spellcheck="false"/>
+      <button class="btn-dl" id="dlBtn" onclick="startDownload()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download
+      </button>
+    </div>
+
+    <div class="platform-pill" id="platformPill">
+      <span class="platform-pill-dot"></span>
+      <span id="platformText">Platform detected</span>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-meta">
+        <span id="progressLabel">Fetching file…</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="status-area" id="statusArea"></div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">Why Kanmate</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-icon">🌐</div>
+        <div class="feat-title">Server-Side Proxy</div>
+        <div class="feat-desc">We fetch the file on our server — no CORS blocks, full browser header spoofing</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-title">Smart Detection</div>
+        <div class="feat-desc">Auto-detects 10+ platforms and applies the right download strategy</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔒</div>
+        <div class="feat-title">Private & Safe</div>
+        <div class="feat-desc">Files stream directly to you — nothing stored on our servers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORTED PLATFORMS -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title">Supported Platforms</div>
+    </div>
+    <div class="platform-grid">
+      <div class="p-row"><span class="p-emoji">☁️</span><div class="p-info"><div class="p-name">Google Drive</div></div><span class="p-tag full">Full Download</span></div>
+      <div class="p-row"><span class="p-emoji">📦</span><div class="p-info"><div class="p-name">Dropbox</div></div><span class="p-tag full">Full Download</span></div>
+      <div class="p-row"><span class="p-emoji">🗄️</span><div class="p-info"><div class="p-name">Internet Archive</div></div><span class="p-tag full">Full Download</span></div>
+      <div class="p-row"><span class="p-emoji">🔗</span><div class="p-info"><div class="p-name">Direct PDF URLs</div></div><span class="p-tag full">Full Download</span></div>
+      <div class="p-row"><span class="p-emoji">🏫</span><div class="p-info"><div class="p-name">University & Edu Sites</div></div><span class="p-tag full">Full Download</span></div>
+      <div class="p-row"><span class="p-emoji">🔬</span><div class="p-info"><div class="p-name">Academia.edu</div></div><span class="p-tag partial">Best Effort</span></div>
+      <div class="p-row"><span class="p-emoji">📚</span><div class="p-info"><div class="p-name">Scribd</div></div><span class="p-tag mirror">Mirror Links</span></div>
+      <div class="p-row"><span class="p-emoji">🎓</span><div class="p-info"><div class="p-name">Studocu</div></div><span class="p-tag mirror">Alternatives</span></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title">How It Works</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Paste the Link</div>
+        <div class="step-desc">Copy any PDF or document URL and paste it into Kanmate</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Proxy Fetches It</div>
+        <div class="step-desc">Our server requests the file with smart headers — no CORS, no browser blocks</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 03</div>
+        <div class="step-title">File Downloads</div>
+        <div class="step-desc">The PDF streams straight to your downloads folder, ready to use</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <img src="logo-full.png" alt="Kanmate" class="footer-logo"/>
+    <div class="footer-text">Smart PDF Downloader · Free to use · Files are never stored</div>
+  </footer>
+
+</div>
+
+<script>
+  const PLATFORM_LABELS = {
+    scribd: '📚 Scribd detected',
+    studocu: '🎓 Studocu detected',
+    academia: '🔬 Academia.edu detected',
+    slideshare: '📊 SlideShare detected',
+    dropbox: '📦 Dropbox detected',
+    gdrive: '☁️ Google Drive detected',
+    onedrive: '💾 OneDrive detected',
+    archive: '🗄️ Internet Archive detected',
+    researchgate: '🔬 ResearchGate detected',
+    direct: '🔗 Direct PDF link',
+    generic: '🌐 Generic URL'
+  };
+
+  const urlInput = document.getElementById('urlInput');
+
+  urlInput.addEventListener('input', debounce(detectPlatform, 450));
+  urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') startDownload(); });
+
+  function debounce(fn, ms) {
+    let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+  }
+
+  async function detectPlatform() {
+    const url = urlInput.value.trim();
+    const pill = document.getElementById('platformPill');
+    if (!url || !url.startsWith('http')) { pill.classList.remove('show'); return; }
+    try {
+      const r = await fetch('/api/detect', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url}) });
+      const d = await r.json();
+      document.getElementById('platformText').textContent = PLATFORM_LABELS[d.platform] || d.platform;
+      pill.classList.add('show');
+    } catch {}
+  }
+
+  function setStatus(type, icon, html) {
+    document.getElementById('statusArea').innerHTML =
+      `<div class="status-box ${type}">
+        <span class="status-icon">${icon}</span>
+        <div class="status-text">${html}</div>
+      </div>`;
+  }
+
+  function setProgress(pct, label) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    if (label) document.getElementById('progressLabel').textContent = label;
+  }
+
+  function showProgress(v) { document.getElementById('progressWrap').classList.toggle('show', v); }
+
+  const DL_BTN_DEFAULT = `
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+    </svg> Download`;
+
+  async function startDownload() {
+    const url = urlInput.value.trim();
+    const btn = document.getElementById('dlBtn');
+
+    if (!url) { setStatus('warn', '⚠️', 'Please paste a PDF link first.'); return; }
+    try { new URL(url); } catch { setStatus('error', '✖', 'That doesn\'t look like a valid URL.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spinner"></div> Fetching…`;
+    showProgress(true);
+    setProgress(10, 'Connecting…');
+    document.getElementById('statusArea').innerHTML = '';
+
+    try {
+      setProgress(30, 'Sending to proxy…');
+
+      const res = await fetch('/api/fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+
+      setProgress(60, 'Receiving file…');
+      const ct = res.headers.get('content-type') || '';
+
+      if (ct.includes('application/json')) {
+        const data = await res.json();
+        showProgress(false);
+
+        if (data.platform === 'scribd') {
+          const alts = (data.alternatives || []).map(a =>
+            `<a class="alt-link" href="${a}" target="_blank" rel="noopener">🔗 Mirror</a>`
+          ).join('');
+          setStatus('warn', '📚',
+            `<strong>Scribd</strong> uses DRM — direct download isn't possible without a premium account.<br>Try these mirrors:
+            <div class="alt-links">${alts}
+              <a class="alt-link" href="https://downloader.la/?url=${encodeURIComponent(url)}" target="_blank">🌐 Downloader.la</a>
+              <a class="alt-link" href="https://www.pdfdrive.com/" target="_blank">📚 PDF Drive</a>
+            </div>`);
+          return;
+        }
+
+        if (data.platform === 'studocu') {
+          setStatus('warn', '🎓',
+            `<strong>Studocu</strong> requires a paid login — this can't be bypassed server-side.<br>
+            <div class="alt-links">
+              <a class="alt-link" href="https://www.coursehero.com/" target="_blank">📖 Course Hero</a>
+              <a class="alt-link" href="https://www.pdfdrive.com/" target="_blank">📚 PDF Drive</a>
+              <a class="alt-link" href="${url}" target="_blank">🔗 Open Original</a>
+            </div>`);
+          return;
+        }
+
+        setStatus('error', '✖', data.message || data.error || 'Download failed.');
+        return;
+      }
+
+      if (!res.ok) { throw new Error(`Server error ${res.status}`); }
+
+      const xFilename = res.headers.get('x-kanmate-filename') || '';
+      const cd = res.headers.get('content-disposition') || '';
+      const m = cd.match(/filename="?([^";\n]+)"?/);
+      let filename = xFilename || (m ? m[1] : 'kanmate-document.pdf');
+
+      setProgress(88, 'Preparing download…');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 8000);
+
+      setProgress(100, 'Done!');
+      setTimeout(() => showProgress(false), 1500);
+      const mb = (blob.size / 1024 / 1024).toFixed(2);
+      setStatus('success', '✅', `<strong>${filename}</strong> downloaded successfully! (${mb} MB)`);
+
+    } catch (err) {
+      showProgress(false);
+      const msg = String(err.message || err);
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+        setStatus('error', '🔌', 'Cannot reach the Kanmate server. Make sure it\'s running on port 3000.');
+      } else {
+        setStatus('error', '✖', 'Download failed: ' + msg);
+      }
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = DL_BTN_DEFAULT;
+    }
+  }
+</script>
+</body>
+</html>
